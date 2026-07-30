@@ -6,7 +6,6 @@ __pycache__/
 !.env.example
 venv/
 .venv/
-media/
 staticfiles/
 .pytest_cache/
 .DS_Store

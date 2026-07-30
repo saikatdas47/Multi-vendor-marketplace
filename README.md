@@ -1,5 +1,5 @@
 <a href="https://multi-vendor-marketplace-224q-2u2tblaom.vercel.app" target="_blank">Live Demo</a>
-# CommerceX — Backend (Phase 1)
+# CommerceX 
 
 **Enterprise multi‑vendor e‑commerce API** built with Django 5, DRF, PostgreSQL, and JWT.  
 Phase 1 delivers the core platform: accounts, catalogue, cart, AI assistant, orders, and admin.

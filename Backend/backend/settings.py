@@ -112,7 +112,10 @@ LOCAL_APPS = [
     "assistant",
 ]
 
-INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
+INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS + [
+    'cloudinary',
+    'cloudinary_storage',
+]
 
 MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
@@ -276,12 +279,25 @@ STATIC_URL = env("STATIC_URL", "static/")
 STATIC_ROOT = BASE_DIR / env("STATIC_DIR", "staticfiles")
 # STORAGES, not the STATICFILES_STORAGE string — that form is deprecated since
 # Django 4.2 and emits a warning on every start under 5.2.
+
+# STORAGES = {
+#     "default": {"BACKEND": "django.core.files.storage.FileSystemStorage"},
+#     "staticfiles": {
+#         "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage"
+#     },
+# }
+
 STORAGES = {
-    "default": {"BACKEND": "django.core.files.storage.FileSystemStorage"},
+    "default": {
+        "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
+    },
     "staticfiles": {
-        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage"
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
     },
 }
+
+
+
 
 MEDIA_URL = env("MEDIA_URL", "media/")
 MEDIA_ROOT = BASE_DIR / env("MEDIA_DIR", "media")

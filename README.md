@@ -1,4 +1,4 @@
-Live Demo: [https://multi-vendor-marketplace-224q-2u2tblaom.vercel.app](https://multi-vendor-marketplace-224q.vercel.app)
+<a href="https://multi-vendor-marketplace-224q-2u2tblaom.vercel.app" target="_blank">Live Demo</a>
 # CommerceX — Backend (Phase 1)
 
 **Enterprise multi‑vendor e‑commerce API** built with Django 5, DRF, PostgreSQL, and JWT.  

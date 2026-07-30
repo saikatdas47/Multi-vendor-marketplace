@@ -19,15 +19,14 @@ from dotenv import load_dotenv
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-ENV_FILE = BASE_DIR / ".env"
-if not ENV_FILE.exists():
-    raise ImproperlyConfigured(
-        f"No .env file at {ENV_FILE}. Copy .env.example to .env and fill it in. "
-        "Refusing to start with guessed defaults - a silent fallback to the "
-        "wrong database or an insecure key is very hard to debug."
-    )
-load_dotenv(ENV_FILE)
 
+ENV_FILE = BASE_DIR / ".env"
+if ENV_FILE.exists():
+    load_dotenv(ENV_FILE)
+else:
+    # On Render (and other platforms), environment variables are set directly.
+    # No .env file needed.
+    pass
 
 # ----------------------------------------------------------- env helpers
 

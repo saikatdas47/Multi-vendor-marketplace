@@ -1,17 +1,37 @@
+# Core Django & REST
 Django==5.2.16
 djangorestframework==3.15.2
 djangorestframework-simplejwt==5.3.1
+
+# Database (PostgreSQL)
 psycopg2-binary==2.9.9
+
+# Environment configuration
 python-dotenv==1.0.1
+
+# Cross-Origin Resource Sharing
 django-cors-headers==4.4.0
+
+# Filtering & pagination
 django-filter==24.3
+
+# API schema (OpenAPI)
 drf-spectacular==0.27.2
+
+# Image handling (product images, profile pics)
 Pillow==10.4.0
+
+# Static file serving in production
 whitenoise==6.7.0
+
+# WSGI server
 gunicorn==23.0.0
+
+# AI / Groq integration
 groq==0.13.1
 
-# dev / test
+# ---------- Testing (optional for production, but harmless) ----------
 pytest==8.3.2
 pytest-django==4.9.0
 factory-boy==3.3.1
+

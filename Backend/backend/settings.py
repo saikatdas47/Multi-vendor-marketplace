@@ -147,32 +147,20 @@ TEMPLATES = [
 
 # -------------------------------------------------------------- database
 
+# ------------------------------------------------------------------ database
+
 def _database_from_url(url):
-    """Parse the single connection string every hosting platform hands out.
-
-    Render, Neon, Railway and Supabase all give you one `DATABASE_URL` rather
-    than five separate variables, so without this you would be picking a URL
-    apart by hand in a dashboard field — which is exactly where a typo becomes a
-    30-minute debugging session.
-
-    Hand-parsed with urllib rather than adding `dj-database-url`: it is ten lines
-    and one less dependency to keep pinned.
-    """
+    """Parse the single connection string every hosting platform hands out."""
     parsed = urlparse(url)
     if parsed.scheme not in ("postgres", "postgresql"):
         raise ImproperlyConfigured(
             f"DATABASE_URL must be a postgres:// URL, got {parsed.scheme!r}."
         )
-
-    # Query parameters carry the TLS mode that hosted Postgres requires;
-    # Neon in particular refuses a connection without sslmode=require.
     options = dict(parse_qsl(parsed.query))
-
     return {
         "ENGINE": "django.db.backends.postgresql",
         "NAME": unquote(parsed.path.lstrip("/")),
         "USER": unquote(parsed.username or ""),
-        # unquote matters: generated passwords routinely contain % and @.
         "PASSWORD": unquote(parsed.password or ""),
         "HOST": parsed.hostname or "",
         "PORT": str(parsed.port or "5432"),
@@ -180,14 +168,12 @@ def _database_from_url(url):
         "OPTIONS": options,
     }
 
-
 DATABASE_URL = env("DATABASE_URL", "")
 
 if DATABASE_URL:
     DATABASES = {"default": _database_from_url(DATABASE_URL)}
 else:
-    # Local development keeps the explicit variables, so nothing about the
-    # existing setup changes.
+    # Local development keeps the explicit variables.
     DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.postgresql",

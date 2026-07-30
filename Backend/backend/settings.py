@@ -14,6 +14,7 @@ from pathlib import Path
 
 from urllib.parse import parse_qsl, unquote, urlparse
 
+import cloudinary
 from django.core.exceptions import ImproperlyConfigured
 from dotenv import load_dotenv
 
@@ -275,6 +276,10 @@ CSRF_TRUSTED_ORIGINS = CORS_ALLOWED_ORIGINS
 
 # ----------------------------------------------------------------- files
 
+
+# Configure Cloudinary using the URL from environment
+cloudinary.config(url=env('CLOUDINARY_URL'))
+
 STATIC_URL = env("STATIC_URL", "static/")
 STATIC_ROOT = BASE_DIR / env("STATIC_DIR", "staticfiles")
 # STORAGES, not the STATICFILES_STORAGE string — that form is deprecated since
@@ -287,6 +292,16 @@ STATIC_ROOT = BASE_DIR / env("STATIC_DIR", "staticfiles")
 #     },
 # }
 
+# #cloudinary migration
+# STORAGES = {
+#     "default": {
+#         "BACKEND": "django.core.files.storage.FileSystemStorage",
+#     },
+#     "staticfiles": {
+#         "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+#     },
+# }
+
 STORAGES = {
     "default": {
         "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
@@ -295,8 +310,6 @@ STORAGES = {
         "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
     },
 }
-
-
 
 
 MEDIA_URL = env("MEDIA_URL", "media/")

@@ -10,4 +10,4 @@ staticfiles/
 .pytest_cache/
 .DS_Store
 
-
+media/

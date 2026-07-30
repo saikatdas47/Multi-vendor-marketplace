@@ -1,0 +1,36 @@
+# Render Blueprint — recreates the service from the repo instead of from
+# clicks in a dashboard nobody wrote down.
+#
+# The database is deliberately NOT defined here. Render's own free Postgres
+# expires; Neon's free tier does not, so the connection string is set manually
+# as DATABASE_URL. See DEPLOY.md.
+services:
+  - type: web
+    name: commercex-api
+    runtime: python
+    plan: free
+    rootDir: Backend
+    buildCommand: ./build.sh
+    # 2 workers on 512 MB is the ceiling before the free instance starts
+    # OOM-restarting under any real traffic.
+    startCommand: gunicorn backend.wsgi:application --workers 2 --timeout 60
+    healthCheckPath: /health/
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.12.6"
+      - key: DEBUG
+        value: "False"
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DATABASE_URL
+        sync: false        # paste the Neon connection string
+      - key: ALLOWED_HOSTS
+        sync: false        # commercex-api.onrender.com
+      - key: FRONTEND_URL
+        sync: false        # https://your-app.vercel.app
+      - key: CORS_ALLOWED_ORIGINS
+        sync: false        # same as FRONTEND_URL
+      - key: GROQ_API_KEY
+        sync: false        # blank is fine — AI degrades gracefully
+      - key: SEED_DEMO
+        value: "true"

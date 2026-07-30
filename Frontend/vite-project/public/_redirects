@@ -1,0 +1,8 @@
+# Netlify and Cloudflare Pages read this file.
+#
+# A React Router app serves every route from one index.html. Without a catch-all
+# rewrite, only "/" works: opening /shops/voltedge or /admin/sellers/1 directly,
+# or refreshing on them, asks the host for a file that does not exist and gets a
+# 404. The 200 status (not 301) matters — a redirect would change the URL and
+# lose the route.
+/*    /index.html   200

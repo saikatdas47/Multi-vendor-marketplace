@@ -1,0 +1,16 @@
+import { Router } from "express";
+import * as c from "../controllers/catalog.controller.js";
+import * as media from "../controllers/media.controller.js";
+import * as ai from "../controllers/assistant.controller.js";
+import { allowRoles, optionalJWT, verifyJWT } from "../middlewares/auth.middleware.js";
+import { upload } from "../middlewares/upload.middleware.js";
+import { cacheResponse, invalidateAfter } from "../middlewares/cache.middleware.js";
+const r=Router();
+r.get("/categories/",cacheResponse("categories",300),c.categories);r.get("/categories/tree/",cacheResponse("category-tree",300),c.categoryTree);
+r.get("/products/",optionalJWT,cacheResponse("products",90),c.products);r.post("/products/",verifyJWT,allowRoles("seller"),invalidateAfter("products:*","shop:*","shops:*"),c.createProduct);r.get("/products/low-stock/",verifyJWT,allowRoles("seller"),c.lowStock);
+r.get("/products/:slug/reviews/",c.productReviews);r.get("/products/:slug/ai-summary/",ai.reviewSummary);r.post("/products/:slug/adjust-stock/",verifyJWT,allowRoles("seller"),c.adjustStock);
+r.get("/products/:slug/",c.productDetail);r.patch("/products/:slug/",verifyJWT,allowRoles("seller"),invalidateAfter("products:*","shop:*","shops:*"),c.updateProduct);r.delete("/products/:slug/",verifyJWT,allowRoles("seller"),invalidateAfter("products:*","shop:*","shops:*"),c.deleteProduct);
+r.get("/reviews/",verifyJWT,c.listReviews);r.post("/reviews/",verifyJWT,allowRoles("customer"),c.createReview);r.patch("/reviews/:id/",verifyJWT,c.updateReview);r.delete("/reviews/:id/",verifyJWT,c.deleteReview);r.post("/reviews/:id/helpful/",verifyJWT,c.helpfulReview);
+r.post("/product-images/",verifyJWT,allowRoles("seller"),upload.single("image"),media.addImage);r.patch("/product-images/:id/",verifyJWT,allowRoles("seller"),media.updateImage);r.delete("/product-images/:id/",verifyJWT,allowRoles("seller"),media.deleteImage);
+r.get("/shops/",cacheResponse("shops",180),c.shops);r.get("/shops/:slug/",cacheResponse("shop",180),c.shopDetail);r.post("/ai/draft-listing/",verifyJWT,allowRoles("seller"),ai.draftListing);
+export default r;

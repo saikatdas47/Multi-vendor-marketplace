@@ -1,0 +1,41 @@
+services:
+  - type: web
+    name: commercex-marketplace
+    runtime: node
+    region: singapore
+    plan: free
+    buildCommand: bash scripts/render-build.sh
+    startCommand: node backend/scripts/seedIfEmpty.js && node backend/src/index.js
+    healthCheckPath: /ready/
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL
+        sync: false
+      - key: DATABASE_SSL
+        value: "true"
+      - key: REDIS_URL
+        fromService:
+          type: keyvalue
+          name: commercex-cache
+          property: connectionString
+      - key: SECRET_KEY
+        generateValue: true
+      - key: JWT_ACCESS_MINUTES
+        value: "30"
+      - key: JWT_REFRESH_DAYS
+        value: "7"
+      - key: DEBUG
+        value: "false"
+      - key: CLOUDINARY_URL
+        sync: false
+      - key: GROQ_API_KEY
+        sync: false
+
+  - type: keyvalue
+    name: commercex-cache
+    region: singapore
+    plan: free
+    ipAllowList: []
+    maxmemoryPolicy: allkeys-lru
+    persistenceMode: off

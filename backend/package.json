@@ -1,0 +1,35 @@
+{
+  "name": "commercex-node-backend",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "nodemon src/index.js",
+    "db:reset": "node scripts/resetDatabase.js",
+    "seed": "node scripts/seed.js",
+    "test": "node --test",
+    "test:integration": "RUN_INTEGRATION=YES node --test test/integration.test.js",
+    "test:coverage": "c8 --reporter=text --reporter=html node --test",
+    "benchmark": "node scripts/benchmark.js"
+  },
+  "dependencies": {
+    "bcrypt": "^6.0.0",
+    "cloudinary": "^2.11.0",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "jsonwebtoken": "^9.0.3",
+    "multer": "^2.0.2",
+    "nodemailer": "^10.0.11",
+    "pg": "^8.16.3",
+    "redis": "^6.2.1",
+    "socket.io": "^4.8.4"
+  },
+  "devDependencies": {
+    "c8": "^12.0.0",
+    "nodemon": "^3.1.14",
+    "socket.io-client": "^4.8.4",
+    "supertest": "^7.3.0"
+  }
+}

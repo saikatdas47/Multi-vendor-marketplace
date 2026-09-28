@@ -22,7 +22,9 @@ export const optionalJWT = async (req, _res, next) => {
   if (!token) return next();
   try {
     const decoded = verifyToken(token);
-    req.user = await findUserById(decoded.user_id);
+    if (decoded.type !== "access") return next();
+    const user = await findUserById(decoded.user_id);
+    if (user?.is_active) req.user = user;
   } catch {}
   next();
 };

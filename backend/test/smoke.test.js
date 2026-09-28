@@ -27,3 +27,34 @@ test("protected customer endpoint rejects anonymous requests", async () => {
     assert.equal((await response.json()).detail, "Authentication credentials were not provided.");
   });
 });
+
+test("verify endpoint validates the access-token DTO", async () => {
+  await withServer(async (base) => {
+    const response = await fetch(`${base}/api/v1/auth/verify/`, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({}),
+    });
+    assert.equal(response.status, 400);
+    const body = await response.json();
+    assert.equal(body.detail, "Request validation failed.");
+    assert.equal(body.errors[0].field, "token");
+  });
+});
+
+test("chat history requires an authenticated owner", async () => {
+  await withServer(async (base) => {
+    const response = await fetch(`${base}/api/v1/assistant/history/00000000-0000-0000-0000-000000000000/`);
+    assert.equal(response.status, 401);
+  });
+});
+
+test("OpenAPI documentation is available", async () => {
+  await withServer(async (base) => {
+    const response = await fetch(`${base}/api/docs/openapi.json`);
+    const body = await response.json();
+    assert.equal(response.status, 200);
+    assert.equal(body.openapi, "3.0.3");
+    assert.ok(body.paths["/auth/verify/"]);
+  });
+});

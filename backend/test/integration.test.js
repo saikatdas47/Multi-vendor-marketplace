@@ -23,6 +23,43 @@ test("auth roles and seller authorization", { skip: !enabled }, async () => {
   assert.equal(forbidden.status, 403);
 });
 
+test("access-token verification is separate from refresh rotation", { skip: !enabled }, async () => {
+  const customer = await login("customer@commercex.test");
+  const verified = await fetch(`${base}/api/v1/auth/verify/`, {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({ token: customer.access }),
+  });
+  assert.equal(verified.status, 200);
+  assert.equal((await verified.json()).valid, true);
+
+  const rejected = await fetch(`${base}/api/v1/auth/verify/`, {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({ token: customer.refresh }),
+  });
+  assert.equal(rejected.status, 401);
+});
+
+test("chat history is restricted to the session owner", { skip: !enabled }, async () => {
+  const [customer, seller] = await Promise.all([
+    login("customer@commercex.test"),
+    login("seller@commercex.test"),
+  ]);
+  const asked = await fetch(`${base}/api/v1/assistant/ask/`, {
+    method: "POST",
+    headers: authHeaders(customer.access),
+    body: JSON.stringify({ message: "Show me popular products" }),
+  });
+  assert.equal(asked.status, 200);
+  const sessionId = (await asked.json()).session_id;
+
+  const forbidden = await fetch(`${base}/api/v1/assistant/history/${sessionId}/`, {
+    headers: authHeaders(seller.access),
+  });
+  assert.equal(forbidden.status, 403);
+});
+
 test("checkout reserves inventory and cancellation restores it", { skip: !enabled }, async () => {
   const customer = await login("customer@commercex.test");
   const headers = authHeaders(customer.access);

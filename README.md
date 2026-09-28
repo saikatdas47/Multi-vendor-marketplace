@@ -100,6 +100,7 @@ docker compose up --build
 - Backend and bundled SPA: `http://localhost:8000`
 - Health: `http://localhost:8000/health/`
 - Readiness: `http://localhost:8000/ready/`
+- Swagger UI: `http://localhost:8000/api/docs`
 
 PostgreSQL initializes from `backend/scripts/schema.sql`. The backend seeds only when the database is empty.
 
@@ -108,12 +109,12 @@ PostgreSQL initializes from `backend/scripts/schema.sql`. The backend seeds only
 ```bash
 cd backend
 npm install
-npm run db:reset
+npm run db:migrate
 npm run seed
 npm start
 ```
 
-`db:reset` is destructive and requires `ALLOW_DATABASE_RESET=YES`.
+For an intentionally clean database, `db:reset` is destructive and requires `ALLOW_DATABASE_RESET=YES`.
 
 ```bash
 cd frontend
@@ -139,6 +140,12 @@ npm run test:e2e
 ```
 
 Playwright covers Customer → Cart → Checkout and Seller → Order management. Failure traces, screenshots and an HTML report are enabled.
+
+## API documentation and migrations
+
+Interactive Swagger documentation is available at `/api/docs`; the OpenAPI document is served from `/api/docs/openapi.json`.
+
+Database changes are stored in `backend/migrations` and applied in filename order with checksums and a PostgreSQL advisory lock. Render and Docker apply pending migrations before seeding or starting the API. Never edit an already-applied migration; add the next numbered SQL file instead.
 
 ## Deploy to Render
 
@@ -210,6 +217,7 @@ Run the benchmark with Redis enabled to record comparable miss and hit results o
 |---|---|
 | `npm start` | Start the API |
 | `npm run seed` | Seed demo data |
+| `npm run db:migrate` | Apply pending PostgreSQL migrations |
 | `npm test` | Safe smoke tests |
 | `npm run test:integration` | Live auth and Socket.IO tests |
 | `npm run test:coverage` | Text and HTML coverage report |

@@ -8,6 +8,7 @@ import { frontendOrigin } from "../config/origins.js";
 import { createTokens, tokenHash, verifyToken } from "../utils/tokens.js";
 import { slugify } from "../utils/helpers.js";
 import { sendEmail } from "../utils/email.js";
+import jwt from "jsonwebtoken";
 
 const passwordOk = (password) => typeof password === "string" && password.length >= Number(process.env.PASSWORD_MIN_LENGTH || 8);
 
@@ -58,13 +59,33 @@ export const login = asyncHandler(async (req, res) => {
 
 export const refresh = asyncHandler(async (req, res) => {
   const raw = req.body.refresh;
-  const decoded = verifyToken(raw);
+  let decoded;
+  try {
+    decoded = verifyToken(raw);
+  } catch (error) {
+    if (error instanceof jwt.TokenExpiredError) throw new ApiError(401, "Refresh token has expired. Please sign in again.");
+    throw new ApiError(401, "Refresh token is invalid.");
+  }
   if (decoded.type !== "refresh") throw new ApiError(401, "Token has wrong type.");
   const stored = await query("DELETE FROM refresh_tokens WHERE token_hash=$1 AND expires_at>NOW() RETURNING user_id", [tokenHash(raw)]);
   if (!stored.rowCount) throw new ApiError(401, "Token is invalid or expired.");
   const user = await findUserById(decoded.user_id);
-  if (!user || !user.is_active) throw new ApiError(401, "User not found.");
+  if (!user || !user.is_active) throw new ApiError(401, "The account for this refresh token is unavailable.");
   res.json(await createTokens(user));
+});
+
+export const verifyAccessToken = asyncHandler(async (req, res) => {
+  try {
+    const decoded = verifyToken(req.body.token);
+    if (decoded.type !== "access") throw new ApiError(401, "Token has wrong type.");
+    const user = await findUserById(decoded.user_id);
+    if (!user || !user.is_active) throw new ApiError(401, "Token user is unavailable.");
+    res.json({ valid: true, user: publicUser(user) });
+  } catch (error) {
+    if (error.statusCode) throw error;
+    if (error instanceof jwt.TokenExpiredError) throw new ApiError(401, "Access token has expired.");
+    throw new ApiError(401, "Access token is invalid.");
+  }
 });
 
 export const logout = asyncHandler(async (req, res) => {

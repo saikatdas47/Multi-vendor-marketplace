@@ -6,6 +6,7 @@
     "start": "node src/index.js",
     "dev": "nodemon src/index.js",
     "db:reset": "node scripts/resetDatabase.js",
+    "db:migrate": "node scripts/migrate.js",
     "seed": "node scripts/seed.js",
     "test": "node --test",
     "test:integration": "RUN_INTEGRATION=YES node --test test/integration.test.js",
